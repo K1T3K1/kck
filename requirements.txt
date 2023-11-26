@@ -1,0 +1,7 @@
+aiohttp==3.8.6
+duckdb==0.9.1
+fastapi==0.104.0
+pandas==2.1.2
+uvicorn==0.23.2
+PyTermGUI==7.7.0
+PyYAML==6.0.1
