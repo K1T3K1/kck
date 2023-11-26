@@ -35,7 +35,7 @@ async def get_todos() -> Response:
             except Exception as e:
                 logger.critical(e)
     except Exception as e:
-        logger.info(e)
+        return Response("Couldn't return To do's", 200)
     return Response(None, status_code=500)
 
 
@@ -69,6 +69,8 @@ async def post_todo(
             logger.info("commit successfull")
         except duckdb.ConstraintException as e:
             return Response("Task with such name already exists", 409)
+        except Exception as e:
+            return Response("Something is wrong with the form", 422)
     return Response(None, 200)
 
 
@@ -111,7 +113,7 @@ async def put_todo(
             logger.info(e)
             return Response("Task with such name already exists", 409)
         except Exception as e:
-            return Response(e.args[0], 200)
+            return Response("Something is wrong with the form", 422)
     return Response(None, 200)
 
 
