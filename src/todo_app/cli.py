@@ -87,7 +87,7 @@ class CLIView:
             ptg.Label(" "),
             ptg.Button(
                 " UI ",
-                onclick=lambda *_: webbrowser.open("http://localhost:8000/docs"),
+                onclick=lambda *_: webbrowser.open("file:///Users/kpz/college_files/KCK/kck/src/frontend/build/index.html"),
             ),
             ptg.Label(""),
             ptg.Button(
@@ -158,7 +158,8 @@ class CLIView:
                     response_text = await resp.text()
                     return self.parse_todos(response_text)
                 else:
-                    self.display_error()
+                    resp_txt = await resp.text()
+                    self.display_error(f"Response: {resp_txt} | Code: {resp.status}")
 
     def display_error(
         self,
@@ -282,7 +283,7 @@ class CLIView:
     async def put_todo(self, todo: Todo) -> None:
         async with aiohttp.ClientSession(self.api) as client:
             async with client.put(
-                f"/todo/{todo.id}?name={todo.name}&description={todo.description}&deadline={todo.deadline}&status={todo.status}"
+                f"/todo/{todo.id}?name={todo.name}&description={todo.description}&deadline={todo.deadline.isoformat()[:-6]}&status={todo.status}"
             ) as resp:
                 resp_txt = await resp.text()
                 self.display_error(f"Response: {resp_txt} | Code: {resp.status}")

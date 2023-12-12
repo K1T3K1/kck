@@ -71,7 +71,7 @@ async def post_todo(
             return Response("Task with such name already exists", 409)
         except Exception as e:
             return Response("Something is wrong with the form", 422)
-    return Response(None, 200)
+    return JSONResponse('Accepted', 200)
 
 
 @router.put("/{todo_id}")
@@ -104,8 +104,6 @@ async def put_todo(
             logger.info(type(df.deadline[0]))
             if isinstance(df.deadline[0], date):
                 df.loc[0, "deadline"] = datetime.combine(df.deadline[0], time.min)
-            conn.register("df", df)
-            
             query = f"UPDATE {todo_table} SET name = '{df.name[0]}', description = '{df.description[0]}', deadline = '{df.deadline[0].isoformat()}', status = '{df.status[0]}' WHERE id = {df.id[0]};"
             conn.execute(query)
             conn.commit()
@@ -114,7 +112,7 @@ async def put_todo(
             return Response("Task with such name already exists", 409)
         except Exception as e:
             return Response("Something is wrong with the form", 422)
-    return Response(None, 200)
+    return JSONResponse('Accepted', 200)
 
 
 def create_db():
@@ -123,7 +121,7 @@ def create_db():
             conn.sql(f"SELECT 1 FROM {todo_table}")
         except duckdb.CatalogException as e:
             conn.sql(
-                f"CREATE TABLE {todo_table} (id BIGINT PRIMARY KEY, name STRING NOT NULL, description STRING, deadline TIMESTAMPTZ NOT NULL, status STRING);"
+                f"CREATE TABLE {todo_table} (id BIGINT, name STRING NOT NULL, description STRING, deadline TIMESTAMPTZ NOT NULL, status STRING);"
             )
-            conn.sql(f"CREATE UNIQUE INDEX name_deadline ON {todo_table} (name, deadline)")
+            #conn.sql(f"CREATE UNIQUE INDEX name_deadline ON {todo_table} (name, deadline)")
             conn.sql("CREATE SEQUENCE IF NOT EXISTS todo_id START 1;")

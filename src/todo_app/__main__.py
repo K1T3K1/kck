@@ -1,6 +1,7 @@
 import pytermgui as ptg
 from .cli import CLIView
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from .todo_api import router
 import uvicorn
 import asyncio
@@ -17,21 +18,39 @@ que: queue.Queue = queue.Queue(-1)  # no limit on size
 queue_handler = QueueHandler(que)
 log_format = "%(levelname) -10s %(asctime)s %(name) -30s %(funcName) -35s %(lineno) -5d: %(message)s"
 handler = logging.StreamHandler()
-handler.setLevel(logging.WARN)
+handler.setLevel(logging.INFO)
 handler.setFormatter(logging.Formatter(log_format))
 listener = QueueListener(que, handler)
 logger = logging.getLogger()
-logger.setLevel(logging.WARN)
+logger.setLevel(logging.INFO)
 logger.addHandler(handler)
 listener.start()
 
 logger = logging.getLogger(__name__)
 
-
+def generate_origins():
+    origins = []
+    for i in range(10):
+        origins.append(f"http://localhost:{3000 + i}")
+    return origins
 def run_server(port):
     app = FastAPI()
+    generate_origins
+    origins = [
+        "http://localhost",
+        "http://localhost:8080",
+    ]
+    origins.extend(generate_origins())
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"]
+    )
     app.include_router(router)
-    uvicorn.run(app, port=port, log_level=logging.CRITICAL)
+    uvicorn.run(app, port=port, log_level=logging.INFO)
 
 def sigterm_handler(_signo, _stack_frame, server_process):
     server_process.terminate()

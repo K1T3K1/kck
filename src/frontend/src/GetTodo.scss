@@ -1,0 +1,239 @@
+@use 'sass:color';
+
+$color: lighten(#5e42a6, 6%);
+$border: 12px;
+$maxwidth: 35%;
+$hue: 277deg;
+$hue-adjust: 135deg;
+
+$hue-contrast: color.hue(color.adjust(hsl($hue, 100%, 50%), $hue: $hue-adjust));
+
+
+.title {
+  background: $color;
+  width: $maxwidth;
+  border-radius: $border;
+  padding: 1.5rem;
+  box-shadow: 0 -0.5rem 1rem rgba(0 0 0 / 0.15);
+  color: white;
+}
+
+.editTitle {
+  @extend .title;
+  width: 85%;
+  min-width: 75%;
+}
+
+.mainGetBox {
+  display: flex;
+  flex: 0 0 0;
+  flex-direction: row;
+  width: 100%;
+
+  ul {
+    margin-right: 0.1rem;
+  }
+}
+
+.todoBox {
+  display: flex;
+  flex-direction: column;
+  margin: 2px;
+  width: 50%;
+}
+
+.editForm {
+  position: fixed;
+  width: 20%; // lub width: 300px; (lub inna jednostka)
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  margin-left: 2.3rem;
+  padding: 1rem;
+
+  border-radius: $border;
+  box-shadow: 0.5rem -0.5rem 1rem rgba(0 0 0 / 0.15);
+  color: white;
+  font-weight: bold;
+  background: $color;
+  box-sizing: border-box;
+
+  .inputClass {
+    border-radius: $border - 6px;
+    box-shadow: 1rem 1em 1rem rgba(0 0 0 / 0.15);
+  }
+
+  input {
+    @extend .inputClass;
+    max-width: $maxwidth
+  }
+
+  textarea {
+    @extend .inputClass;
+    margin-top: 0.2rem;
+    width: 80%;
+    box-sizing: border-box;
+  }
+}
+
+ul {
+  list-style: none;
+
+  .card {
+    position: sticky;
+    top: 0;
+    background: $color;
+    padding: 1.5rem;
+    box-shadow: 0 -0.5rem 1rem rgba(0 0 0 / 0.15);
+    border-radius: $border;
+    width: 75%;
+    min-width: $maxwidth;
+    margin-right: 0.1rem;
+    margin-bottom: 0.2rem;
+    color: white;
+
+    .todoName {
+      font-size: larger;
+    }
+
+    .cardBoxes {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      padding-top: 0.1rem;
+      padding-left: 1rem;
+      padding-bottom: 1rem;
+      border-radius: $border;
+      box-shadow: 0.5rem -0.5rem 1rem rgba(0 0 0 / 0.15);
+    }
+
+    .description {
+      @extend .cardBoxes
+    }
+
+    .deadline {
+      @extend .cardBoxes;
+      padding-top: 1rem;
+    }
+
+    .todoStatus {
+      @extend .cardBoxes;
+      padding-top: 1rem;
+    }
+
+    button {
+      // We're using HSL values, so we can use hsla() and control opacity when required
+      // hsla(hue, saturation, lightness, opacity)
+
+      --text-base: #{$hue},
+      55%,
+      40%;
+      --text-hover: #{$hue + 30},
+      72%,
+      86%;
+
+      --shadow-start: #{$hue-contrast},
+      100%,
+      72%;
+      --shadow-end: #{$hue + 5},
+      90%,
+      50%;
+
+      --shadow-inner: #{$hue},
+      90%,
+      62%;
+
+      all: unset;
+
+      // Text
+      margin-top: 0.5rem;
+      margin-right: 1rem;
+      color: darken($color, 25%);
+      font: 700 1.125rem/1.2 Raleway, sans-serif;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+      font-size: small;
+
+      // Button sizing
+      padding: 0.85em;
+      max-width: 100%;
+      width: 12em;
+
+      // Button styling
+      background: inherit;
+      background-clip: padding-box;
+      border: 5px solid darken($color, 25%);
+      border-radius: 2em;
+      cursor: pointer;
+
+      // Effects
+      position: relative;
+      transition: 0.25s ease-out;
+
+      // Set up pseudo elements
+      &::before,
+      &::after {
+        content: "";
+        border-radius: inherit;
+        transition: inherit;
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      // Gradient shadow
+      &::before {
+        // Position
+        inset: -0.2em;
+        z-index: -1;
+
+        // Effect
+        background: linear-gradient(hsla(var(--shadow-start), 1), hsla(var(--shadow-end), 1));
+        filter: blur(1.2em) saturate(1.2);
+
+        // Animation
+        transform-origin: bottom;
+        transform: scaleY(0.5);
+        opacity: 0;
+      }
+
+      // Semi-transparent blended box-shadow brightens up the border
+      &::after {
+        // Effect
+        box-shadow: inset 0 0 0 1px #fff, // inner pixel
+          0 0 0 4px hsla(0deg, 0%, 100%, 0.7), // ligthened border
+          1px 1px 0 4px #fff; // outer pixel
+        mix-blend-mode: overlay;
+
+        // Animation
+        opacity: 0;
+      }
+
+      &:hover,
+      &:focus {
+        color: hsla(var(--text-hover), 1);
+
+        // Lighten border
+        border-color: transparent;
+
+        // Inner shadow
+        box-shadow:
+          inset 0 1.4em 0 hsla(var(--shadow-inner), 0.1), // gloss
+          inset 0 0 1.4em hsla(var(--shadow-inner), 0.32), // inner glow
+          0 1px 1px hsla(var(--shadow-inner), 0.32); // bottom line
+
+        // Show effects
+        &::before,
+        &::after {
+          transform: none;
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+@for $i from 1 through 10000 {
+  .card:nth-child(#{$i}) {
+    top: $i + rem;
+  }
+}
